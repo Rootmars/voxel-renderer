@@ -17,7 +17,7 @@ namespace core {
     }
 
     Voxel& KV6Model::GetVoxel(int x, int y, int z) {
-        int offset = (size_.x + size_.y) * z + size_.x * y + x;
+        int offset = (size_.x * size_.y) * z + size_.x * y + x;
         return voxels_[offset];
     }
 

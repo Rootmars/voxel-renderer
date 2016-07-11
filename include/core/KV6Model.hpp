@@ -9,8 +9,8 @@
 namespace core {
     struct Voxel;
 
-	class KV6Model {
-	public:
+    class KV6Model {
+    public:
         // size_ and pivot_ must be immutable after creating the object
         KV6Model(math::IntVector3 size, math::Vector3 pivot);
         ~KV6Model();
@@ -23,11 +23,11 @@ namespace core {
         void SetColor(int x, int y, int z, math::ByteColor3 newcolor);
         void SetColor(math::IntVector3 pos, math::ByteColor3 newcolor);
 
-	private:
+    private:
         const math::IntVector3 size_;
         const math::Vector3 pivot_;
         std::vector<Voxel> voxels_;
         Voxel& GetVoxel(int x, int y, int z);
         Voxel& GetVoxel(math::IntVector3 pos);
-	};
+    };
 }
