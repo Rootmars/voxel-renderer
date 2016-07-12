@@ -26,11 +26,10 @@ if (NOT GLM_FOUND)
     message(FATAL_ERROR "GLM not found.")
 endif()
 
-include_directories(include)
-include_directories(include/core)
+#include_directories(${SDL2_INCLUDE_DIR})
+#include_directories(${SDL2_IMAGE_INCLUDE_DIR})
+#include_directories(${OPENGL_INCLUDE_DIR})
+#include_directories(${GLEW_INCLUDE_DIR})
+include_directories(${GLM_INCLUDE_DIR})
 
-file(GLOB SRC_CORE src/core/*.cpp)
-
-add_executable(${PROJECT_NAME} ${SRC_CORE})
-
-set_property(TARGET ${PROJECT_NAME} PROPERTY CXX_STANDARD 11)
+add_subdirectory(./src)
