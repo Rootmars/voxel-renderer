@@ -4,7 +4,7 @@
 #include <iostream>
 
 int main() {
-    std::unique_ptr<program::KV6Model> m = program::KV6Model::LoadModel("assets/sphere.kv6");
+    std::unique_ptr<program::KV6Model> m = program::KV6Model::LoadModel("../assets/sphere.kv6");
     std::cout << m->GetSize().x << std::endl;
     std::cout << m->GetSize().y << std::endl;
     std::cout << m->GetSize().z << std::endl;

@@ -32,4 +32,6 @@ endif()
 #include_directories(${GLEW_INCLUDE_DIR})
 include_directories(${GLM_INCLUDE_DIR})
 
+file(COPY ./assets DESTINATION .)
+
 add_subdirectory(./src)
