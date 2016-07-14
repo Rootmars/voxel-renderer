@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Common.hpp"
+#include "Math.hpp"
 
 #include <glm/glm.hpp>
 
@@ -20,17 +20,14 @@ namespace program {
 
         static std::unique_ptr<KV6Model> LoadModel(std::string filename);
 
-        bool GetSolidity(int x, int y, int z);
         bool GetSolidity(IntVector3 pos);
-        ByteColor3 GetColor(int x, int y, int z);
         ByteColor3 GetColor(IntVector3 pos);
+        uint8_t GetFaceBits(IntVector3 pos);
         IntVector3 GetSize();
         Vector3 GetPivot();
-        void SetSolidity(int x, int y, int z, bool newsolidity);
         void SetSolidity(IntVector3 pos, bool newsolidity);
-        void SetColor(int x, int y, int z, ByteColor3 newcolor);
         void SetColor(IntVector3 pos, ByteColor3 newcolor);
-        void SetPivot(int x, int y, int z);
+        void SetFaceBits(IntVector3 pos, uint8_t newfacebits);
         void SetPivot(Vector3 pivot);
 
     private:

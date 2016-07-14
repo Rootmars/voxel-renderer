@@ -1,6 +1,6 @@
 #include "KV6Model.hpp"
 
-#include "Common.hpp"
+#include "Math.hpp"
 
 #include "glm/glm.hpp"
 
@@ -12,23 +12,30 @@
 namespace program {
     struct Voxel {
         bool solidity;
+        uint8_t facebits;
         ByteColor3 color;
     };
 
-    Voxel& KV6Model::GetVoxel(int x, int y, int z) {
-        int offset = (size_.x * size_.y) * z + size_.x * y + x;
-        return voxels_[offset];
-    }
+    enum FaceFlags {
+        LEFT = 0x01,
+        RIGHT = 0x02,
+        BACK = 0x04,
+        FRONT = 0x08,
+        UP = 0x10,
+        DOWN = 0x20
+    };
 
     Voxel& KV6Model::GetVoxel(IntVector3 pos) {
-        return GetVoxel(pos.x, pos.y, pos.z);
+        int offset = (size_.x * size_.y) * pos.z + size_.x * pos.y + pos.x;
+        return voxels_[offset];
     }
 
     KV6Model::KV6Model(IntVector3 size) : size_(size) {
         voxels_.resize(size.x * size.y * size.z);
     }
 
-    KV6Model::KV6Model(int length, int width, int height) : size_(IntVector3(length, width, height)) {
+    KV6Model::KV6Model(int length, int width, int height) :
+    size_(IntVector3{length, width, height}) {
         voxels_.resize(length * width * height);
     }
 
@@ -45,7 +52,7 @@ namespace program {
     struct KV6Block {
         uint32_t color; // 0xLLRRGGBB
         uint16_t zpos;
-        uint8_t visfaces; // we don't care about this. Or do we?
+        uint8_t visfaces; // 0x00zZyYxX, small letter being the positive
         uint8_t lighting; // we don't care about this.
     };
 
@@ -77,8 +84,8 @@ namespace program {
         file.read(reinterpret_cast<char*> (xyoffset.data()),
                   sizeof(uint16_t) * xsize * ysize);
 
-        IntVector3 size = IntVector3(xsize, ysize, zsize);
-        Vector3 pivot = Vector3(xpivot, ypivot, zpivot);
+        IntVector3 size = IntVector3{xsize, ysize, zsize};
+        Vector3 pivot = Vector3{xpivot, ypivot, zpivot};
 
         std::unique_ptr<KV6Model> model(new KV6Model(size));
         model->SetPivot(pivot);
@@ -91,13 +98,15 @@ namespace program {
         };
 
         int readoffset = 0;
-        for (int x = 0; x < xsize; x++) {
-            for (int y = 0; y < ysize; y++) {
-                for (int column = 0; column < xyoffset[x * ysize + y];
+        for (auto x = 0; x < xsize; x++) {
+            for (auto y = 0; y < ysize; y++) {
+                for (auto column = 0; column < xyoffset[x * ysize + y];
                 column++, readoffset++) {
-                    KV6Block b = blockdata[readoffset];
-                    model->SetSolidity(x, y, b.zpos, true);
-                    model->SetColor(x, y, b.zpos, colorfromhex(b.color));
+                    const KV6Block& b = blockdata[readoffset];
+                    IntVector3 pos = IntVector3{x, y, b.zpos};
+                    model->SetSolidity(pos, true);
+                    model->SetColor(pos, colorfromhex(b.color));
+                    model->SetFaceBits(pos, b.visfaces);
                 }
             }
         }
@@ -105,20 +114,16 @@ namespace program {
         return model;
     }
 
-    bool KV6Model::GetSolidity(int x, int y, int z) {
-        return GetVoxel(x, y, z).solidity;
-    }
-
     bool KV6Model::GetSolidity(IntVector3 pos) {
         return GetVoxel(pos).solidity;
     }
 
-    ByteColor3 KV6Model::GetColor(int x, int y, int z) {
-        return GetVoxel(x, y, z).color;
-    }
-
     ByteColor3 KV6Model::GetColor(IntVector3 pos) {
         return GetVoxel(pos).color;
+    }
+
+    uint8_t KV6Model::GetFaceBits(IntVector3 pos) {
+        return GetVoxel(pos).facebits;
     }
 
     IntVector3 KV6Model::GetSize() {
@@ -129,27 +134,19 @@ namespace program {
         return pivot_;
     }
 
-    void KV6Model::SetSolidity(int x, int y, int z, bool newsolidity) {
-        GetVoxel(x, y, z).solidity = newsolidity;
-    }
-
     void KV6Model::SetSolidity(IntVector3 pos, bool newsolidity) {
         GetVoxel(pos).solidity = newsolidity;
-    }
-
-    void KV6Model::SetColor(int x, int y, int z, ByteColor3 newcolor) {
-        GetVoxel(x, y, z).color = newcolor;
     }
 
     void KV6Model::SetColor(IntVector3 pos, ByteColor3 newcolor) {
         GetVoxel(pos).color = newcolor;
     }
 
-    void KV6Model::SetPivot(int x, int y, int z) {
-        pivot_ = IntVector3(x, y, z);
+    void KV6Model::SetFaceBits(IntVector3 pos, uint8_t newfacebits) {
+        GetVoxel(pos).facebits = newfacebits;
     }
 
     void KV6Model::SetPivot(Vector3 pivot) {
         pivot_ = pivot;
-    }    
+    }
 }

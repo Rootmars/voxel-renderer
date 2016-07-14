@@ -1,4 +1,5 @@
 #include "./core/KV6Model.hpp"
+#include "./core/Math.hpp"
 
 #include <memory>
 #include <iostream>
@@ -15,7 +16,7 @@ int main() {
     for (int z = 0; z < m->GetSize().z; z++) {
         for (int y = 0; y < m->GetSize().y; y++) {
             for (int x = 0; x < m->GetSize().x; x++) {
-                if (m->GetSolidity(x, y, z)) {
+                if (m->GetSolidity(program::IntVector3{x, y, z})) {
                     std::cout << "X";
                 }
                 else {
