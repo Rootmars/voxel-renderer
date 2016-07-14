@@ -91,10 +91,10 @@ namespace program {
         model->SetPivot(pivot);
 
         auto colorfromhex = [](uint32_t hex) -> ByteColor3 {
-            uint8_t r = hex && 0x000000FF;
-            uint8_t g = (hex && 0x0000FF00) >> 2;
-            uint8_t b = (hex && 0x00FF0000) >> 4;
-            return ByteColor3(r, g, b);
+            uint8_t r = (hex & 0x00FF0000) >> 16;
+            uint8_t g = (hex & 0x0000FF00) >> 8;
+            uint8_t b = (hex & 0x000000FF) >> 0;
+            return ByteColor3{r, g, b};
         };
 
         int readoffset = 0;
